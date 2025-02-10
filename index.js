@@ -21,9 +21,9 @@ db.connect((err) => {
   });
 
 app.post('/setData', (req, res) => {
-  const {name, age} = req.body;
-  const query = 'insert into users (name, age) values (?, ?)';
-  db.query(query, [name, age], (err, result) => {
+  const {id, name, age} = req.body;
+  const query = 'insert into users (id, name, age) values (?, ?, ?)';
+  db.query(query, [id, name, age], (err, result) => {
     if (err){
       console.error('Error inserting data:', err);
       res.status(500).send('Failed to insert data.');
