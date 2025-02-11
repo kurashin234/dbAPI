@@ -15,15 +15,6 @@ const db = mysql.createPool({
 
 app.use(express.json());
 
-db.connect((err) => {
-    if (err) {
-      console.error('Database connection failed:', err.stack);
-      return;
-    }
-    console.log('Connected to the database.');
-  });
-
-
 app.post('/setData', (req, res) => {
   const {id, name, age} = req.body;
   const query = 'insert into users (id, name, age) values (?, ?, ?)';
