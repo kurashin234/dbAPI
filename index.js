@@ -17,27 +17,32 @@ app.use(express.json());
 
 app.post('/setData', (req, res) => {
   const {id, name, age} = req.body;
-  const query = 'insert into users (id, name, age) values (?, ?, ?)';
-  db.query(query, [id, name, age], (err, result) => {
-    if (err){
-      console.error('Error inserting data:', err);
-      res.status(500).send('Failed to insert data.');
-      return;
+  db.query(
+    'insert into users (id, name, age) values (?, ?, ?)', 
+    [id, name, age], 
+    (err, result) => {
+      if (err){
+        console.error('Error inserting data:', err);
+        res.status(500).send('Failed to insert data.');
+        return;
+      }
+      res.status(201).send('User added successfuly');
     }
-    res.status(201).send('User added successfuly');
-  });
+  );
 });
 
 app.get('/getData', (req, res) => {
-  const query = 'SELECT * FROM users';
-  db.query(query, (err, results) => {
-    if (err) {
-      console.error('Error executing query:', err);
-      res.status(500).send('Database query failed.');
-      return;
+  db.query(
+    'SELECT * FROM users', 
+    (err, results) => {
+      if (err) {
+        console.error('Error executing query:', err);
+        res.status(500).send('Database query failed.');
+        return;
+      }
+      res.json(results);
     }
-    res.json(results);
-  });
+  );
 });
 
 app.listen(port, () => {
