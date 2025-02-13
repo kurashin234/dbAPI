@@ -3,22 +3,17 @@ const mysql = require('mysql2');
 const app = express();
 const port = 3000;
 
-const db = mysql.createConnection({
-  host: '127.0.0.0',
+const db = mysql.createPool({
+  host: 'localhost',
   user: 'newSql',
   password: 'Strong@Passw0rd',
   database: 'test_db',
+  waitForConnections: true,
+  connectionLimit: 10,  // 最大接続数
+  queueLimit: 0
 });
 
 app.use(express.json());
-
-db.connect((err) => {
-    if (err) {
-      console.error('Database connection failed:', err.stack);
-      return;
-    }
-    console.log('Connected to the database.');
-  });
 
 app.post('/setData', (req, res) => {
   const {id, name, age} = req.body;
