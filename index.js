@@ -17,7 +17,7 @@ app.use(express.json());
 
 app.post('/setData', (req, res) => {
   const {id, name, age} = req.body;
-  const query = 'insert into users (id, name, age) values'+ id + name + age;
+  const query = 'insert into users (id, name, age) values('+ id + name + age;
   db.query(query, (err, result) => {
     if (err){
       console.error('Error inserting data:', err);
