@@ -1,13 +1,14 @@
+require('dotenv').config();
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
 const port = 3000;
 
 const db = mysql.createPool({
-  host: 'localhost',
-  user: 'newSql',
-  password: 'Strong@Passw0rd',
-  database: 'test_db',
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
   connectionLimit: 10,  // 最大接続数
   queueLimit: 0
@@ -33,7 +34,7 @@ app.post('/setData', (req, res) => {
 
 app.get('/getData', (req, res) => {
   db.query(
-    'SELECT * FROM users', 
+    'select * from users', 
     (err, results) => {
       if (err) {
         console.error('Error executing query:', err);
