@@ -16,18 +16,43 @@ const db = mysql.createPool({
 
 app.use(express.json());
 
-app.post('/setData', (req, res) => {
-  const {id, name, age} = req.body;
+//ユーザーを追加する
+app.post('/setUser', (req, res) => {
+  const {name, password, group_id} = req.body;
+
   db.query(
-    'insert into users (id, name, age) values (?, ?, ?)', 
-    [id, name, age], 
+    'insert into users (name, password, group_id) values (?, ?, ?)', //table作成時に重複エラー設定済み
+    [name, password, group_id], 
     (err, result) => {
-      if (err){
-        console.error('Error inserting data:', err);
+      if (err) {
+        if (err.code === 'ER_DUP_ENTRY') {
+          console.error('Duplicate entry:', err);
+          res.status(400).send('User already exists.');
+          return;
+        }
+        console.error('INSERT error:', err);
         res.status(500).send('Failed to insert data.');
         return;
       }
-      res.status(201).send('User added successfuly');
+      res.status(201).send('User added successfully');
+    }
+  );
+});
+
+//ユーザーが存在しているかチェック
+app.get('/checkUser', (req, res) => {
+  const {name, password, group_id} = req.query;
+  db.query(
+    'select * from users where name = ? and password = ? and group_id = ?',
+    [name, password, group_id],
+    (err, results) => {
+      if (err){
+        console.error('Error executing query', err);
+        res.status(500).send('err');
+        return;
+      }
+      //ユーザーが存在している場合trueをjsonで返す
+      res.json({"checkResult": results.length > 0});
     }
   );
 });
@@ -38,7 +63,7 @@ app.get('/getData', (req, res) => {
     (err, results) => {
       if (err) {
         console.error('Error executing query:', err);
-        res.status(500).send('Database query failed.');
+        res.status(500).send('error' + err);
         return;
       }
       res.json(results);
