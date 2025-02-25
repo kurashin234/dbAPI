@@ -104,7 +104,7 @@ app.get('/getTask', (req, res) => {
   const {group_id} = req.query;
 
   db.query(
-    'select taskName, group_id from tasks where group_id = ? and delete_at is null',
+    'select id, taskName, deadline, (difficulty / ratingCount) as AVGdifficulty, (elapsedTime / ratingCount) as AVGtime from tasks where group_id = ? and delete_at is null',
     group_id,
     (err, result) => {
       if (err){
@@ -118,6 +118,26 @@ app.get('/getTask', (req, res) => {
         return;
       }
       res.status(201).send(result);
+    }
+  );
+});
+
+//難易度・締め切り追加
+app.put("/addDCTandDL", (req, res) => {
+  const {id} = req.query;
+  const {deadline, difficulty, elapsedTime} = req.body;
+
+  db.query(
+    'update tasks set deadline = ?, difficulty = difficulty + ?, elapsedTime = elapsedTime + ?, ratingCount = ratingCount + 1 where id = ?',
+    [deadline, difficulty, elapsedTime, id],
+    (err, result) => {
+      if (err){
+        console.error("Error: ", err);
+        res.status(500).send("Failed to add deadline and difficulty");
+        return;
+      }
+
+      res.status(201).send("OK");
     }
   );
 });
