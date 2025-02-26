@@ -1,4 +1,5 @@
 require('dotenv').config();
+const bcrypt = require('bcrypt');
 const express = require('express');
 const mysql = require('mysql2');
 const app = express();
@@ -17,12 +18,14 @@ const db = mysql.createPool({
 app.use(express.json());
 
 //ユーザーを追加する
-app.post('/setUser', (req, res) => {
+app.post('/setUser', async (req, res) => {
   const {name, password, group_id} = req.body;
+  const hashed = await bcrypt.hash(password, 10);
 
+  //console.log(hashed);
   db.query(
     'insert into users (name, password, group_id) values (?, ?, ?)', //table作成時に重複エラー設定済み
-    [name, password, group_id], 
+    [name, hashed, group_id], 
     (err, result) => {
       if (err) {
         if (err.code === 'ER_DUP_ENTRY') {
@@ -44,16 +47,29 @@ app.get('/checkUser', (req, res) => {
   const {name, password, group_id} = req.query;
 
   db.query(
-    'select * from users where name = ? and password = ? and group_id = ?',
-    [name, password, group_id],
-    (err, results) => {
+    'select password from users where name = ? and group_id = ?',
+    [name, group_id],
+    async (err, results) => {
       if (err){
         console.error('Error executing query', err);
         res.status(500).send('err');
         return;
       }
-      //ユーザーが存在している場合trueをjsonで返す
-      res.json({"checkResult": results.length > 0});
+      
+      if(results.length === 0){
+        res.status(200).send(false);
+        return;
+      }
+
+      let judgePassword = false;
+      for (data of results){
+        judgePassword = await bcrypt.compare(password, data.password);
+        if (judgePassword) break;
+      }
+      
+      //console.log(judgePassword);
+      //ユーザーが存在している場合true返す
+      res.status(201).send(judgePassword);
     }
   );
 });
