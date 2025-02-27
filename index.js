@@ -33,7 +33,7 @@ app.post('/setUser', async (req, res) => {
           res.status(400).send('User already exists.');
           return;
         }
-        console.error('INSERT error:', err);
+        console.error(err);
         res.status(500).send('Failed to insert data.');
         return;
       }
@@ -51,7 +51,7 @@ app.get('/checkUser', (req, res) => {
     [name, group_id],
     async (err, results) => {
       if (err){
-        console.error('Error executing query', err);
+        console.error(err);
         res.status(500).send('err');
         return;
       }
@@ -83,7 +83,7 @@ app.post("/setTask", (req, res) => {
     [taskName, group_id],
     (err, result) =>{
       if (err){
-        console.error("Error:", err);
+        console.error(err);
         res.status(500).send("Failed to insert data");
         return;
       }
@@ -101,7 +101,7 @@ app.put("/deleteTask", (req, res) => {
     id,
     (err, result) => {
       if (err){
-        console.error("Error:", err);
+        console.error(err);
         res.status(500).send("Failed to update data");
         return;
       }
@@ -124,7 +124,7 @@ app.get('/getTask', (req, res) => {
     group_id,
     (err, result) => {
       if (err){
-        console.error("Error: ", err);
+        console.error(err);
         res.status(500).send("Failed to get task data");
         return;
       }
@@ -148,7 +148,7 @@ app.put("/addDCTandDL", (req, res) => {
     [deadline, difficulty, elapsedTime, id],
     (err, result) => {
       if (err){
-        console.error("Error: ", err);
+        console.error(err);
         res.status(500).send("Failed to add deadline and difficulty");
         return;
       }
@@ -167,7 +167,7 @@ app.post("/setUrl", (req, res) => {
     [url, tasks_id],
     (err, result) =>{
       if (err){
-        console.error("Error", err);
+        console.error(err);
         res.status(500).send("Failed to insert url data");
         return;
       }
@@ -186,7 +186,7 @@ app.put('/deleteUrl', (req, res) => {
     id,
     (err, result) => {
       if (err){
-        console.error("Error", err);
+        console.error(err);
         res.status(500).send("Failed to delete url");
         return;
       }
@@ -210,10 +210,25 @@ app.get('/getUrl', (req, res) => {
     tasks_id,
     (err, result) => {
       if (err){
-        console.error("Error:", err);
+        console.error(err);
         res.status(500).send("Failed to get url");
       }
 
+      res.status(201).send(result);
+    }
+  );
+});
+
+//学科を取得
+app.get('/getGroup', (req, res) => {
+  db.query(
+    'select id, courseName as groupName from courses',
+    (err, result) => {
+      if (err){
+        console.error(err);
+        res.status(500).send("Failed to get groups");
+        return;
+      }
       res.status(201).send(result);
     }
   );
